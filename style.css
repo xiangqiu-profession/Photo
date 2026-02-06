@@ -1,0 +1,522 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #ffb7c5 0%, #e6f7ff 100%);
+    perspective: 1500px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* 樱花飘落特效 */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* 樱花样式 */
+body::before {
+    background-image: 
+        radial-gradient(circle, #ffb3ba 2px, transparent 2px),
+        radial-gradient(circle, #ff9999 1px, transparent 1px),
+        radial-gradient(circle, #ffb3ba 2px, transparent 2px),
+        radial-gradient(circle, #ff9999 1px, transparent 1px);
+    background-size: 50px 50px, 30px 30px, 40px 40px, 25px 25px;
+    background-position: 0 0, 15px 15px, 25px 25px, 40px 40px;
+    animation: sakura-fall 20s linear infinite;
+}
+
+/* 樱花飘落动画 */
+@keyframes sakura-fall {
+    0% {
+        transform: translateY(-100%) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* 添加更多樱花元素 */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    background-image: 
+        radial-gradient(circle, #ffb3ba 2px, transparent 2px),
+        radial-gradient(circle, #ff9999 1px, transparent 1px);
+    background-size: 60px 60px, 35px 35px;
+    background-position: 10px 10px, 20px 20px;
+    animation: sakura-fall 25s linear infinite 1s;
+}
+
+/* 确保容器在樱花之上 */
+.container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-style: preserve-3d;
+}
+
+.album {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    transform-style: preserve-3d;
+    animation: rotate 15s linear infinite;
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform-origin: center;
+}
+
+.album.expanded {
+    animation: none;
+    transform: rotateX(10deg) rotateY(10deg);
+}
+
+.album.expanded .photo {
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 200px !important;
+    height: 200px !important;
+    display: block !important;
+    opacity: 1 !important;
+    z-index: 1 !important;
+}
+
+/* 为每个面设置固定位置 */
+.album.expanded .photo:nth-child(1) {
+    transform: rotateX(0deg) rotateY(0deg) translateZ(300px) !important;
+}
+
+.album.expanded .photo:nth-child(2) {
+    transform: rotateX(0deg) rotateY(180deg) translateZ(300px) !important;
+}
+
+.album.expanded .photo:nth-child(3) {
+    transform: rotateX(0deg) rotateY(-90deg) translateZ(300px) !important;
+}
+
+.album.expanded .photo:nth-child(4) {
+    transform: rotateX(0deg) rotateY(90deg) translateZ(300px) !important;
+}
+
+.album.expanded .photo:nth-child(5) {
+    transform: rotateX(90deg) rotateY(0deg) translateZ(300px) !important;
+}
+
+.album.expanded .photo:nth-child(6) {
+    transform: rotateX(-90deg) rotateY(0deg) translateZ(300px) !important;
+}
+
+/* 外层展开图片的旋转动画 */
+@keyframes outer-rotate {
+    0% {
+        transform: rotateX(0deg) rotateY(0deg) translateZ(300px);
+    }
+    100% {
+        transform: rotateX(360deg) rotateY(360deg) translateZ(300px);
+    }
+}
+
+.photo {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    left: 0;
+    top: 0;
+    backface-visibility: visible;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4), inset 0 0 20px rgba(255,255,255,0.1);
+    transform-origin: center;
+    transition: all 0.5s ease;
+    display: block;
+    opacity: 0.5; /* 外层图片透明度50% */
+    z-index: 1;
+}
+
+.photo:hover {
+    box-shadow: 0 12px 35px rgba(0,0,0,0.5), inset 0 0 30px rgba(255,255,255,0.2);
+    transform: scale(1.05);
+}
+
+.photo::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: all 0.3s ease;
+    transform: translateZ(0);
+}
+
+.photo:hover::before {
+    transform: scale(1.1) translateZ(0);
+}
+
+.photo:nth-child(1) {
+    /* 前面 */
+    transform: rotateY(0deg) translateZ(100px);
+}
+
+.photo:nth-child(2) {
+    /* 后面 */
+    transform: rotateY(180deg) translateZ(100px);
+}
+
+.photo:nth-child(3) {
+    /* 左面 */
+    transform: rotateY(-90deg) translateZ(100px);
+}
+
+.photo:nth-child(4) {
+    /* 右面 */
+    transform: rotateY(90deg) translateZ(100px);
+}
+
+.photo:nth-child(5) {
+    /* 上面 */
+    transform: rotateX(90deg) translateZ(100px);
+}
+
+.photo:nth-child(6) {
+    /* 下面 */
+    transform: rotateX(-90deg) translateZ(100px);
+}
+
+/* 展开状态下的位置 */
+.album.expanded .photo:nth-child(1) {
+    /* 前面 */
+    transform: rotateX(0deg) rotateY(0deg) translateZ(300px);
+}
+
+.album.expanded .photo:nth-child(2) {
+    /* 后面 */
+    transform: rotateX(0deg) rotateY(180deg) translateZ(300px);
+}
+
+.album.expanded .photo:nth-child(3) {
+    /* 左面 */
+    transform: rotateX(0deg) rotateY(-90deg) translateZ(300px);
+}
+
+.album.expanded .photo:nth-child(4) {
+    /* 右面 */
+    transform: rotateX(0deg) rotateY(90deg) translateZ(300px);
+}
+
+.album.expanded .photo:nth-child(5) {
+    /* 上面 */
+    transform: rotateX(90deg) rotateY(0deg) translateZ(300px);
+}
+
+.album.expanded .photo:nth-child(6) {
+    /* 下面 */
+    transform: rotateX(-90deg) rotateY(0deg) translateZ(300px);
+}
+
+/* 内层小立方体样式 */
+.inner-album {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transform-style: preserve-3d;
+    opacity: 0;
+    transition: all 1s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.album.expanded .inner-album {
+    opacity: 1;
+    animation: inner-rotate 10s linear infinite !important;
+}
+
+.inner-photo {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    left: 0;
+    top: 0;
+    backface-visibility: hidden;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transform-origin: center;
+    opacity: 0.8; /* 内层图片透明度80% */
+}
+
+.inner-photo::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: all 0.3s ease;
+}
+
+/* 内层立方体6个面的位置 */
+.inner-photo:nth-child(1) {
+    transform: rotateY(0deg) translateZ(50px);
+}
+
+.inner-photo:nth-child(2) {
+    transform: rotateY(180deg) translateZ(50px);
+}
+
+.inner-photo:nth-child(3) {
+    transform: rotateY(-90deg) translateZ(50px);
+}
+
+.inner-photo:nth-child(4) {
+    transform: rotateY(90deg) translateZ(50px);
+}
+
+.inner-photo:nth-child(5) {
+    transform: rotateX(90deg) translateZ(50px);
+}
+
+.inner-photo:nth-child(6) {
+    transform: rotateX(-90deg) translateZ(50px);
+}
+
+/* 内层立方体图片 */
+.inner-photo:nth-child(1)::before {
+    background-image: url('IMG/7.png');
+}
+
+.inner-photo:nth-child(2)::before {
+    background-image: url('IMG/8.png');
+}
+
+.inner-photo:nth-child(3)::before {
+    background-image: url('IMG/1.png');
+}
+
+.inner-photo:nth-child(4)::before {
+    background-image: url('IMG/2.png');
+}
+
+.inner-photo:nth-child(5)::before {
+    background-image: url('IMG/3.png');
+}
+
+.inner-photo:nth-child(6)::before {
+    background-image: url('IMG/4.png');
+}
+
+/* 内层立方体旋转动画 */
+@keyframes inner-rotate {
+    0% {
+        transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg);
+    }
+    100% {
+        transform: translate(-50%, -50%) rotateX(360deg) rotateY(360deg);
+    }
+}
+
+/* 确保外层和内层使用相同的旋转速度 */
+.album.expanded .photo,
+.album.expanded .inner-album {
+    animation-duration: 10s !important;
+    animation-timing-function: linear !important;
+    animation-iteration-count: infinite !important;
+}
+
+/* 确保外层图片和内层立方体同步旋转 */
+.album.expanded .inner-album {
+    animation: inner-rotate 10s linear infinite !important;
+}
+
+.photo::before {
+    background-image: var(--bg-image, url('IMG/1.png'));
+}
+
+.inner-photo::before {
+    background-image: var(--bg-image, url('IMG/1.png'));
+}
+
+/* 确保所有照片面都能正确显示 */
+.album.expanded .photo {
+    display: block !important;
+    opacity: 1 !important;
+    z-index: 1 !important;
+    animation: outer-rotate 10s linear infinite !important;
+}
+
+
+.photo {
+    display: block;
+    opacity: 1;
+    z-index: 1;
+}
+
+
+
+
+.photo:hover::before {
+    transform: scale(1.1);
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotateX(0deg) rotateY(0deg);
+    }
+    100% {
+        transform: rotateX(360deg) rotateY(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .album {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .photo {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .photo:nth-child(1) {
+        transform: rotateY(0deg) translateZ(75px);
+    }
+    
+    .photo:nth-child(2) {
+        transform: rotateY(180deg) translateZ(75px);
+    }
+    
+    .photo:nth-child(3) {
+        transform: rotateY(-90deg) translateZ(75px);
+    }
+    
+    .photo:nth-child(4) {
+        transform: rotateY(90deg) translateZ(75px);
+    }
+    
+    .photo:nth-child(5) {
+        transform: rotateX(90deg) translateZ(75px);
+    }
+    
+    .photo:nth-child(6) {
+        transform: rotateX(-90deg) translateZ(75px);
+    }
+    
+    /* 移动设备上的展开状态 */
+    .album.expanded .photo:nth-child(1) {
+        transform: rotateX(0deg) rotateY(0deg) translateZ(200px);
+    }
+    
+    .album.expanded .photo:nth-child(2) {
+        transform: rotateX(0deg) rotateY(180deg) translateZ(200px);
+    }
+    
+    .album.expanded .photo:nth-child(3) {
+        transform: rotateX(0deg) rotateY(-90deg) translateZ(200px);
+    }
+    
+    .album.expanded .photo:nth-child(4) {
+        transform: rotateX(0deg) rotateY(90deg) translateZ(200px);
+    }
+    
+    .album.expanded .photo:nth-child(5) {
+        transform: rotateX(90deg) rotateY(0deg) translateZ(200px);
+    }
+    
+    .album.expanded .photo:nth-child(6) {
+        transform: rotateX(-90deg) rotateY(0deg) translateZ(200px);
+    }
+    
+    /* 移动设备上的外层展开图片旋转动画 */
+    .album.expanded .photo {
+        animation: mobile-outer-rotate 10s linear infinite !important;
+    }
+    
+    @keyframes mobile-outer-rotate {
+        0% {
+            transform: rotateX(0deg) rotateY(0deg) translateZ(200px);
+        }
+        100% {
+            transform: rotateX(360deg) rotateY(360deg) translateZ(200px);
+        }
+    }
+    
+    /* 确保移动设备上所有照片面都能正确显示 */
+    @media (max-width: 768px) {
+        .album.expanded .photo {
+            display: block !important;
+            opacity: 1 !important;
+            z-index: 1 !important;
+            animation: mobile-outer-rotate 10s linear infinite !important;
+        }
+    }
+    
+    /* 移动设备上的内层小立方体 */
+    .inner-album {
+        width: 75px;
+        height: 75px;
+    }
+    
+    .inner-photo {
+        width: 75px;
+        height: 75px;
+    }
+    
+    .inner-photo:nth-child(1) {
+        transform: rotateY(0deg) translateZ(37.5px);
+    }
+    
+    .inner-photo:nth-child(2) {
+        transform: rotateY(180deg) translateZ(37.5px);
+    }
+    
+    .inner-photo:nth-child(3) {
+        transform: rotateY(-90deg) translateZ(37.5px);
+    }
+    
+    .inner-photo:nth-child(4) {
+        transform: rotateY(90deg) translateZ(37.5px);
+    }
+    
+    .inner-photo:nth-child(5) {
+        transform: rotateX(90deg) translateZ(37.5px);
+    }
+    
+    .inner-photo:nth-child(6) {
+        transform: rotateX(-90deg) translateZ(37.5px);
+    }
+}
