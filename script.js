@@ -1,11 +1,23 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // 预加载图片
+    function preloadImages(imageFiles) {
+        imageFiles.forEach(filename => {
+            const img = new Image();
+            img.src = filename;
+        });
+    }
+    
     // 随机为每个面分配唯一图片
     const photos = document.querySelectorAll('.photo');
     const innerPhotos = document.querySelectorAll('.inner-photo');
+    const allImageFiles = ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png'];
+    
+    // 预加载所有图片
+    preloadImages(allImageFiles);
     
     // 为外层图片随机分配唯一图片
     function getUniqueImages(count) {
-        const imageFiles = ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png', '9.png', '10.png', '11.png', '12.png', '13.png'];
+        const imageFiles = [...allImageFiles]; // 复制数组
         const uniqueImages = [];
         
         for (let i = 0; i < count && imageFiles.length > 0; i++) {
