@@ -15,67 +15,24 @@ body {
     position: relative;
 }
 
+/* 樱花效果canvas样式 */
+#sakura {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
 /* 樱花飘落特效 */
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 0;
+body {
+    background: linear-gradient(135deg, #ffb7c5 0%, #e6f7ff 100%);
+    position: relative;
 }
 
-/* 樱花样式 */
-body::before {
-    background-image: 
-        radial-gradient(circle, #ffb3ba 2px, transparent 2px),
-        radial-gradient(circle, #ff9999 1px, transparent 1px),
-        radial-gradient(circle, #ffb3ba 2px, transparent 2px),
-        radial-gradient(circle, #ff9999 1px, transparent 1px);
-    background-size: 50px 50px, 30px 30px, 40px 40px, 25px 25px;
-    background-position: 0 0, 15px 15px, 25px 25px, 40px 40px;
-    animation: sakura-fall 20s linear infinite;
-}
-
-/* 樱花飘落动画 */
-@keyframes sakura-fall {
-    0% {
-        transform: translateY(-100%) rotate(0deg);
-        opacity: 0;
-    }
-    10% {
-        opacity: 1;
-    }
-    90% {
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(100vh) rotate(360deg);
-        opacity: 0;
-    }
-}
-
-/* 添加更多樱花元素 */
-body::after {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 0;
-    background-image: 
-        radial-gradient(circle, #ffb3ba 2px, transparent 2px),
-        radial-gradient(circle, #ff9999 1px, transparent 1px);
-    background-size: 60px 60px, 35px 35px;
-    background-position: 10px 10px, 20px 20px;
-    animation: sakura-fall 25s linear infinite 1s;
-}
-
-/* 确保容器在樱花之上 */
+/* 确保容器在樱花背景之上 */
 .container {
     position: relative;
     z-index: 1;

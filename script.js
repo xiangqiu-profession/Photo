@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const photos = document.querySelectorAll('.photo');
     const innerPhotos = document.querySelectorAll('.inner-photo');
     const innerAlbum = document.querySelector('.inner-album');
-    const allImageFiles = ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png'];
+    const allImageFiles = ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png','9.png', '10.png', '11.png', '12.png','13.png', '14.png'];
     
     // 预加载所有图片
     preloadImages(allImageFiles);
@@ -61,37 +61,40 @@ document.addEventListener('DOMContentLoaded', function() {
             cancelAnimationFrame(animationId);
             album.classList.add('expanded');
             
-            // 确保所有元素显示
-            const photos = document.querySelectorAll('.photo');
-            const innerAlbum = document.querySelector('.inner-album');
-            
+            // 重置所有元素状态
             photos.forEach(photo => {
                 photo.style.display = 'block';
                 photo.style.opacity = '1';
                 photo.style.zIndex = '1';
-                photo.style.animation = 'none'; // 移除CSS动画
-                // 确保初始位置正确
+                photo.style.animation = 'none';
                 photo.style.transform = '';
             });
             
             if (innerAlbum) {
                 innerAlbum.style.opacity = '1';
-                innerAlbum.style.animation = 'none'; // 移除CSS动画
-                // 确保初始位置正确
+                innerAlbum.style.animation = 'none';
                 innerAlbum.style.transform = 'translate(-50%, -50%)';
             }
             
             // 强制重排
             void album.offsetWidth;
             
-            // 立即启动同步旋转
+            // 启动同步旋转（添加冗余启动）
             startSyncRotation();
+            
+            // 300ms后再次尝试启动，确保动画一定能启动
+            setTimeout(() => {
+                if (album.classList.contains('expanded')) {
+                    startSyncRotation();
+                }
+            }, 300);
         }
     }
     
     // 同步旋转动画函数
     let syncAnimationId = null;
     let syncStartTime = 0;
+    let animationActive = false;
     
     function startSyncRotation() {
         // 清除之前的动画
@@ -100,18 +103,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         syncStartTime = Date.now();
+        animationActive = true;
         syncAnimate();
     }
     
     function syncAnimate() {
-        if (!album.classList.contains('expanded')) return;
+        if (!album.classList.contains('expanded') || !animationActive) {
+            animationActive = false;
+            return;
+        }
         
         const elapsed = (Date.now() - syncStartTime) / 10000; // 10秒/圈
         const rotation = (elapsed * 360) % 360;
         
-        // 使用缓存的元素引用
-        if (photos.length > 0) {
+        // 确保photos数组存在且有元素
+        if (photos && photos.length > 0) {
             photos.forEach((photo, index) => {
+                if (!photo) return;
+                
                 let baseRotation = 0;
                 switch(index) {
                     case 0:
@@ -134,12 +143,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         break;
                 }
                 
+                let transformValue = '';
                 if (index < 4) {
                     // 前、后、左、右四个面
-                    photo.style.transform = `rotateX(${rotation}deg) rotateY(${rotation + baseRotation}deg) translateZ(300px)`;
+                    transformValue = `rotateX(${rotation}deg) rotateY(${rotation + baseRotation}deg) translateZ(300px)`;
                 } else {
                     // 上、下两个面
-                    photo.style.transform = `rotateX(${rotation + baseRotation}deg) rotateY(${rotation}deg) translateZ(300px)`;
+                    transformValue = `rotateX(${rotation + baseRotation}deg) rotateY(${rotation}deg) translateZ(300px)`;
+                }
+                
+                // 确保transform值被正确设置
+                if (photo.style) {
+                    photo.style.transform = transformValue;
                 }
             });
         }
@@ -158,6 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (album.classList.contains('expanded')) {
             // 立即停止同步旋转动画
             cancelAnimationFrame(syncAnimationId);
+            animationActive = false;
             
             // 移除展开类，触发收缩过渡动画
             album.classList.remove('expanded');
@@ -170,7 +186,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 800); // 与过渡时间匹配
             
             // 确保内层立方体隐藏
-            const innerAlbum = document.querySelector('.inner-album');
             if (innerAlbum) {
                 innerAlbum.style.opacity = '0';
             }
