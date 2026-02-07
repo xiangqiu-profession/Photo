@@ -26,7 +26,16 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        imageFiles.forEach(file => {
+        // 优化：限制并发加载数量，避免移动端性能问题
+        const maxConcurrent = 3; // 最多同时加载3张图片
+        let currentIndex = 0;
+        
+        function loadNext() {
+            if (currentIndex >= totalCount) return;
+            
+            const file = imageFiles[currentIndex];
+            currentIndex++;
+            
             const img = new Image();
             img.src = file;
             img.onload = function() {
@@ -34,14 +43,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (loadedCount === totalCount && callback) {
                     callback();
                 }
+                loadNext(); // 加载下一张
             };
             img.onerror = function() {
                 loadedCount++;
                 if (loadedCount === totalCount && callback) {
                     callback();
                 }
+                loadNext(); // 加载下一张
             };
-        });
+        }
+        
+        // 启动并发加载
+        for (let i = 0; i < maxConcurrent && i < totalCount; i++) {
+            loadNext();
+        }
     }
     
     // 为外层图片分配唯一图片
