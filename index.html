@@ -5,19 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D旋转相册</title>
     <link rel="stylesheet" href="style.css">
-    
-    <!-- 预加载图片，提高加载速度 -->
-    <link rel="preload" href="1.png" as="image">
-    <link rel="preload" href="2.png" as="image">
-    <link rel="preload" href="3.png" as="image">
-    <link rel="preload" href="4.png" as="image">
-    <link rel="preload" href="5.png" as="image">
-    <link rel="preload" href="6.png" as="image">
-    <link rel="preload" href="7.png" as="image">
-    <link rel="preload" href="8.png" as="image">
 </head>
 <body>
-    <!-- 樱花效果 -->
     <canvas id="sakura"></canvas>
     
     <div class="container">
@@ -306,7 +295,6 @@
     attribute vec2 aPosition;
     varying vec2 texCoord;
     varying vec2 screenCoord;
-    
     void main(void) {
     gl_Position = vec4(aPosition, 0.0, 1.0);
     texCoord = aPosition.xy * 0.5 + vec2(0.5, 0.5);
@@ -322,10 +310,8 @@
     uniform sampler2D uSrc;
     uniform sampler2D uBloom;
     uniform vec2 uDelta;
-    
     varying vec2 texCoord;
     varying vec2 screenCoord;
-    
     void main(void) {
     vec4 srccol = texture2D(uSrc, texCoord) * 2.0;
     vec4 bloomcol = texture2D(uBloom, texCoord);
@@ -340,7 +326,6 @@
     </script>
     
     <script src="script.js"></script>
-    
     <script>
     // Utilities
     var Vector3 = {};
@@ -414,11 +399,9 @@
     Matrix44.loadLookAt = function (m, vpos, vlook, vup) {
     var frontv = Vector3.create(vpos.x - vlook.x, vpos.y - vlook.y, vpos.z - vlook.z);
     Vector3.normalize(frontv);
-    
     var sidev = Vector3.create(1.0, 0.0, 0.0);
     Vector3.cross(sidev, vup, frontv);
     Vector3.normalize(sidev);
-    
     var topv = Vector3.create(1.0, 0.0, 0.0);
     Vector3.cross(topv, frontv, sidev);
     Vector3.normalize(topv);
@@ -491,7 +474,6 @@
     'sizeArray':new Float32Array([w, h, w / h]),
     'dtxArray':new Float32Array([1.0 / w, 1.0 / h])
     };
-    
     ret.frameBuffer = gl.createFramebuffer();
     ret.renderBuffer = gl.createRenderbuffer();
     ret.texture = gl.createTexture();
@@ -529,7 +511,6 @@
     console.error(errlog);
     return null;
     }
-    
     return retsh;
     }
     
@@ -707,7 +688,6 @@
     var tmpv3 = Vector3.create(0, 0, 0);
     var tmpv = 0;
     var symmetryrand = function() {return (Math.random() * 2.0 - 1.0);};
-    
     for(var i = 0; i < pointFlower.numFlowers; i++) {
     var tmpprtcl = pointFlower.particles[i];
     
@@ -760,7 +740,6 @@
     }
     }
     };
-    
     var repeatEuler = function (prt, cmp) {
     prt.euler[cmp] = prt.euler[cmp] % PI2;
     if(prt.euler[cmp] < 0.0) {
@@ -793,7 +772,6 @@
     var ipos = pointFlower.positionArrayOffset;
     var ieuler = pointFlower.eulerArrayOffset;
     var imisc = pointFlower.miscArrayOffset;
-    
     for(var i = 0; i < pointFlower.numFlowers; i++) {
     var prtcl = pointFlower.particles[i];
     pointFlower.dataArray[ipos] = prtcl.position[0];
@@ -937,6 +915,33 @@
     var effectLib = {};
     
     function createEffectLib() {
+    
+    var vtxsrc, frgsrc;
+    //common
+    var cmnvtxsrc = document.getElementById("fx_common_vsh").textContent;
+    
+    //background
+    frgsrc = document.getElementById("bg_fsh").textContent;
+    effectLib.sceneBg = createEffectProgram(cmnvtxsrc, frgsrc, ['uTimes'], null);
+    
+    // make brightpixels buffer
+    frgsrc = document.getElementById("fx_brightbuf_fsh").textContent;
+    effectLib.mkBrightBuf = createEffectProgram(cmnvtxsrc, frgsrc, null, null);
+    
+    // direction blur
+    frgsrc = document.getElementById("fx_dirblur_r4_fsh").textContent;
+    effectLib.dirBlur = createEffectProgram(cmnvtxsrc, frgsrc, ['uBlurDir'], null);
+    
+    //final composite
+    vtxsrc = document.getElementById("pp_final_vsh").textContent;
+    frgsrc = document.getElementById("pp_final_fsh").textContent;
+    effectLib.finalComp = createEffectProgram(vtxsrc, frgsrc, ['uBloom'], null);
+    }
+    
+    var effectLib = {};
+    
+    function createEffectLib() {
+    
     var vtxsrc, frgsrc;
     //common
     var cmnvtxsrc = document.getElementById("fx_common_vsh").textContent;
@@ -1132,7 +1137,6 @@
     timeInfo.prev = curdate;
     
     if(animating) requestAnimationFrame(animate);
-    
     render();
     }
     

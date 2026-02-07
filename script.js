@@ -1,25 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // 预加载图片
-    function preloadImages(imageFiles) {
-        imageFiles.forEach(filename => {
-            const img = new Image();
-            img.src = filename;
-        });
-    }
-    
-    // 缓存DOM元素引用
-    const album = document.querySelector('.album');
+    // 随机为每个面分配唯一图片
     const photos = document.querySelectorAll('.photo');
     const innerPhotos = document.querySelectorAll('.inner-photo');
-    const innerAlbum = document.querySelector('.inner-album');
-    const allImageFiles = ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png','9.png', '10.png', '11.png', '12.png','13.png', '14.png'];
-    
-    // 预加载所有图片
-    preloadImages(allImageFiles);
     
     // 为外层图片随机分配唯一图片
     function getUniqueImages(count) {
-        const imageFiles = [...allImageFiles]; // 复制数组
+        const imageFiles = ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png', '9.png', '10.png', '11.png', '12.png', '13.png', '14.png'];
         const uniqueImages = [];
         
         for (let i = 0; i < count && imageFiles.length > 0; i++) {
@@ -42,13 +28,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const innerImages = getUniqueImages(innerPhotos.length);
     innerPhotos.forEach((photo, index) => {
         if (innerImages[index]) {
-            // 确保内层图片路径正确
             photo.style.setProperty('--bg-image', `url('${innerImages[index]}')`);
-            // 同时设置背景图片作为备份
-            photo.style.backgroundImage = `url('${innerImages[index]}')`;
         }
     });
     
+    const album = document.querySelector('.album');
     let isPaused = false;
     let animationId = null;
     let startTime = Date.now();
@@ -61,110 +45,85 @@ document.addEventListener('DOMContentLoaded', function() {
             cancelAnimationFrame(animationId);
             album.classList.add('expanded');
             
-            // 重置所有元素状态
+            // 确保所有元素显示
+            const photos = document.querySelectorAll('.photo');
+            const innerAlbum = document.querySelector('.inner-album');
+            
             photos.forEach(photo => {
                 photo.style.display = 'block';
                 photo.style.opacity = '1';
                 photo.style.zIndex = '1';
-                photo.style.animation = 'none';
-                photo.style.transform = '';
+                photo.style.animation = 'none'; // 移除CSS动画
             });
             
             if (innerAlbum) {
                 innerAlbum.style.opacity = '1';
-                innerAlbum.style.animation = 'none';
-                innerAlbum.style.transform = 'translate(-50%, -50%)';
+                innerAlbum.style.animation = 'none'; // 移除CSS动画
             }
             
-            // 强制重排
-            void album.offsetWidth;
-            
-            // 启动同步旋转（添加冗余启动）
-            startSyncRotation();
-            
-            // 300ms后再次尝试启动，确保动画一定能启动
+            // 延迟启动同步旋转，确保过渡动画完成
             setTimeout(() => {
-                if (album.classList.contains('expanded')) {
-                    startSyncRotation();
-                }
-            }, 300);
+                startSyncRotation();
+            }, 800); // 与过渡时间匹配
         }
     }
     
     // 同步旋转动画函数
     let syncAnimationId = null;
     let syncStartTime = 0;
-    let animationActive = false;
     
     function startSyncRotation() {
-        // 清除之前的动画
-        if (syncAnimationId) {
-            cancelAnimationFrame(syncAnimationId);
-        }
-        
         syncStartTime = Date.now();
-        animationActive = true;
         syncAnimate();
     }
     
     function syncAnimate() {
-        if (!album.classList.contains('expanded') || !animationActive) {
-            animationActive = false;
-            return;
-        }
+        if (!album.classList.contains('expanded')) return;
         
         const elapsed = (Date.now() - syncStartTime) / 10000; // 10秒/圈
         const rotation = (elapsed * 360) % 360;
         
-        // 确保photos数组存在且有元素
-        if (photos && photos.length > 0) {
-            photos.forEach((photo, index) => {
-                if (!photo) return;
-                
-                let baseRotation = 0;
-                switch(index) {
-                    case 0:
-                        baseRotation = 0;
-                        break;
-                    case 1:
-                        baseRotation = 180;
-                        break;
-                    case 2:
-                        baseRotation = -90;
-                        break;
-                    case 3:
-                        baseRotation = 90;
-                        break;
-                    case 4:
-                        baseRotation = 90;
-                        break;
-                    case 5:
-                        baseRotation = -90;
-                        break;
-                }
-                
-                let transformValue = '';
-                if (index < 4) {
-                    // 前、后、左、右四个面
-                    transformValue = `rotateX(${rotation}deg) rotateY(${rotation + baseRotation}deg) translateZ(300px)`;
-                } else {
-                    // 上、下两个面
-                    transformValue = `rotateX(${rotation + baseRotation}deg) rotateY(${rotation}deg) translateZ(300px)`;
-                }
-                
-                // 确保transform值被正确设置
-                if (photo.style) {
-                    photo.style.transform = transformValue;
-                }
-            });
-        }
+        const photos = document.querySelectorAll('.photo');
+        const innerAlbum = document.querySelector('.inner-album');
+        
+        // 控制外层图片旋转
+        photos.forEach((photo, index) => {
+            let baseRotation = 0;
+            switch(index) {
+                case 0:
+                    baseRotation = 0;
+                    break;
+                case 1:
+                    baseRotation = 180;
+                    break;
+                case 2:
+                    baseRotation = -90;
+                    break;
+                case 3:
+                    baseRotation = 90;
+                    break;
+                case 4:
+                    baseRotation = 90;
+                    break;
+                case 5:
+                    baseRotation = -90;
+                    break;
+            }
+            
+            if (index < 4) {
+                // 前、后、左、右四个面
+                photo.style.transform = `rotateX(${rotation}deg) rotateY(${rotation + baseRotation}deg) translateZ(300px)`;
+            } else {
+                // 上、下两个面
+                photo.style.transform = `rotateX(${rotation + baseRotation}deg) rotateY(${rotation}deg) translateZ(300px)`;
+            }
+        });
         
         // 控制内层小正方体旋转
         if (innerAlbum) {
             innerAlbum.style.transform = `translate(-50%, -50%) rotateX(${rotation}deg) rotateY(${rotation}deg)`;
         }
         
-        // 确保动画继续
         syncAnimationId = requestAnimationFrame(syncAnimate);
     }
 
@@ -173,7 +132,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (album.classList.contains('expanded')) {
             // 立即停止同步旋转动画
             cancelAnimationFrame(syncAnimationId);
-            animationActive = false;
             
             // 移除展开类，触发收缩过渡动画
             album.classList.remove('expanded');
@@ -186,6 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 800); // 与过渡时间匹配
             
             // 确保内层立方体隐藏
+            const innerAlbum = document.querySelector('.inner-album');
             if (innerAlbum) {
                 innerAlbum.style.opacity = '0';
             }
@@ -266,30 +225,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 photo.style.width = '150px';
                 photo.style.height = '150px';
                 // 重新设置立方体位置
-                if (isExpanded) {
-                    switch(index) {
-                        case 0:
-                            photo.style.transform = 'rotateX(0deg) rotateY(0deg) translateZ(200px)';
-                            break;
-                        case 1:
-                            photo.style.transform = 'rotateX(0deg) rotateY(180deg) translateZ(200px)';
-                            break;
-                        case 2:
-                            photo.style.transform = 'rotateX(0deg) rotateY(-90deg) translateZ(200px)';
-                            break;
-                        case 3:
-                            photo.style.transform = 'rotateX(0deg) rotateY(90deg) translateZ(200px)';
-                            break;
-                        case 4:
-                            photo.style.transform = 'rotateX(90deg) rotateY(0deg) translateZ(200px)';
-                            break;
-                        case 5:
-                            photo.style.transform = 'rotateX(-90deg) rotateY(0deg) translateZ(200px)';
-                            break;
-                    }
-                    // 应用移动设备旋转动画
-                    photo.style.animation = 'mobile-outer-rotate 10s linear infinite';
-                } else {
+                if (!isExpanded) {
                     switch(index) {
                         case 0:
                             photo.style.transform = 'rotateY(0deg) translateZ(75px)';
@@ -353,30 +289,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 photo.style.width = '200px';
                 photo.style.height = '200px';
                 // 重新设置立方体位置
-                if (isExpanded) {
-                    switch(index) {
-                        case 0:
-                            photo.style.transform = 'rotateX(0deg) rotateY(0deg) translateZ(300px)';
-                            break;
-                        case 1:
-                            photo.style.transform = 'rotateX(0deg) rotateY(180deg) translateZ(300px)';
-                            break;
-                        case 2:
-                            photo.style.transform = 'rotateX(0deg) rotateY(-90deg) translateZ(300px)';
-                            break;
-                        case 3:
-                            photo.style.transform = 'rotateX(0deg) rotateY(90deg) translateZ(300px)';
-                            break;
-                        case 4:
-                            photo.style.transform = 'rotateX(90deg) rotateY(0deg) translateZ(300px)';
-                            break;
-                        case 5:
-                            photo.style.transform = 'rotateX(-90deg) rotateY(0deg) translateZ(300px)';
-                            break;
-                    }
-                    // 应用桌面旋转动画
-                    photo.style.animation = 'outer-rotate 10s linear infinite';
-                } else {
+                if (!isExpanded) {
                     switch(index) {
                         case 0:
                             photo.style.transform = 'rotateY(0deg) translateZ(100px)';

@@ -9,30 +9,13 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #ffb7c5 0%, #e6f7ff 100%);
+    background: transparent;
     perspective: 1500px;
     overflow: hidden;
     position: relative;
 }
 
-/* 樱花效果canvas样式 */
-#sakura {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: -1;
-}
-
-/* 樱花飘落特效 */
-body {
-    background: linear-gradient(135deg, #ffb7c5 0%, #e6f7ff 100%);
-    position: relative;
-}
-
-/* 确保容器在樱花背景之上 */
+/* 确保容器在樱花之上 */
 .container {
     position: relative;
     z-index: 1;
@@ -42,6 +25,17 @@ body {
     align-items: center;
     justify-content: center;
     transform-style: preserve-3d;
+}
+
+/* 樱花画布样式 */
+#sakura {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
 }
 
 .album {
@@ -61,39 +55,39 @@ body {
 
 .album.expanded .photo {
     transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 200px !important;
-    height: 200px !important;
-    display: block !important;
-    opacity: 1 !important;
-    z-index: 1 !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 200px;
+    display: block;
+    opacity: 1;
+    z-index: 1;
 }
 
 /* 为每个面设置固定位置 */
 .album.expanded .photo:nth-child(1) {
-    transform: rotateX(0deg) rotateY(0deg) translateZ(300px) !important;
+    transform: rotateX(0deg) rotateY(0deg) translateZ(300px);
 }
 
 .album.expanded .photo:nth-child(2) {
-    transform: rotateX(0deg) rotateY(180deg) translateZ(300px) !important;
+    transform: rotateX(0deg) rotateY(180deg) translateZ(300px);
 }
 
 .album.expanded .photo:nth-child(3) {
-    transform: rotateX(0deg) rotateY(-90deg) translateZ(300px) !important;
+    transform: rotateX(0deg) rotateY(-90deg) translateZ(300px);
 }
 
 .album.expanded .photo:nth-child(4) {
-    transform: rotateX(0deg) rotateY(90deg) translateZ(300px) !important;
+    transform: rotateX(0deg) rotateY(90deg) translateZ(300px);
 }
 
 .album.expanded .photo:nth-child(5) {
-    transform: rotateX(90deg) rotateY(0deg) translateZ(300px) !important;
+    transform: rotateX(90deg) rotateY(0deg) translateZ(300px);
 }
 
 .album.expanded .photo:nth-child(6) {
-    transform: rotateX(-90deg) rotateY(0deg) translateZ(300px) !important;
+    transform: rotateX(-90deg) rotateY(0deg) translateZ(300px);
 }
 
 /* 外层展开图片的旋转动画 */
@@ -271,23 +265,29 @@ body {
     transform: rotateX(-90deg) translateZ(50px);
 }
 
-/* 内层立方体图片使用CSS变量，由JavaScript动态设置 */
-.inner-photo::before {
-    background-image: var(--bg-image, url('1.png'));
+/* 内层立方体图片 */
+.inner-photo:nth-child(1)::before {
+    background-image: url('1.png');
 }
 
-/* 确保内层图片在移动设备上显示 */
-@media (max-width: 768px) {
-    .inner-photo {
-        background-size: cover !important;
-        background-position: center !important;
-    }
-    
-    .inner-photo::before {
-        background-size: cover !important;
-        background-position: center !important;
-        background-image: var(--bg-image, url('1.png')) !important;
-    }
+.inner-photo:nth-child(2)::before {
+    background-image: url('2.png');
+}
+
+.inner-photo:nth-child(3)::before {
+    background-image: url('3.png');
+}
+
+.inner-photo:nth-child(4)::before {
+    background-image: url('4.png');
+}
+
+.inner-photo:nth-child(5)::before {
+    background-image: url('5.png');
+}
+
+.inner-photo:nth-child(6)::before {
+    background-image: url('6.png');
 }
 
 /* 内层立方体旋转动画 */
@@ -303,14 +303,14 @@ body {
 /* 确保外层和内层使用相同的旋转速度 */
 .album.expanded .photo,
 .album.expanded .inner-album {
-    animation-duration: 10s !important;
-    animation-timing-function: linear !important;
-    animation-iteration-count: infinite !important;
+    animation-duration: 10s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
 }
 
 /* 确保外层图片和内层立方体同步旋转 */
 .album.expanded .inner-album {
-    animation: inner-rotate 10s linear infinite !important;
+    animation: inner-rotate 10s linear infinite;
 }
 
 .photo::before {
@@ -323,10 +323,10 @@ body {
 
 /* 确保所有照片面都能正确显示 */
 .album.expanded .photo {
-    display: block !important;
-    opacity: 1 !important;
-    z-index: 1 !important;
-    animation: outer-rotate 10s linear infinite !important;
+    display: block;
+    opacity: 1;
+    z-index: 1;
+    animation: outer-rotate 10s linear infinite;
 }
 
 
