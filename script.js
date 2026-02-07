@@ -16,20 +16,58 @@ document.addEventListener('DOMContentLoaded', function() {
         return uniqueImages;
     }
     
+    // 图片预加载函数
+    function preloadImages(imageFiles, callback) {
+        let loadedCount = 0;
+        const totalCount = imageFiles.length;
+        
+        if (totalCount === 0) {
+            if (callback) callback();
+            return;
+        }
+        
+        imageFiles.forEach(file => {
+            const img = new Image();
+            img.src = file;
+            img.onload = function() {
+                loadedCount++;
+                if (loadedCount === totalCount && callback) {
+                    callback();
+                }
+            };
+            img.onerror = function() {
+                loadedCount++;
+                if (loadedCount === totalCount && callback) {
+                    callback();
+                }
+            };
+        });
+    }
+    
     // 为外层图片分配唯一图片
     const outerImages = getUniqueImages(photos.length);
-    photos.forEach((photo, index) => {
-        if (outerImages[index]) {
-            photo.style.setProperty('--bg-image', `url('${outerImages[index]}')`);
-        }
-    });
     
     // 为内层图片分配唯一图片
     const innerImages = getUniqueImages(innerPhotos.length);
-    innerPhotos.forEach((photo, index) => {
-        if (innerImages[index]) {
-            photo.style.setProperty('--bg-image', `url('${innerImages[index]}')`);
-        }
+    
+    // 合并所有需要预加载的图片
+    const allImages = [...outerImages, ...innerImages];
+    
+    // 预加载图片，然后再分配
+    preloadImages(allImages, function() {
+        // 预加载完成后，为外层图片分配
+        photos.forEach((photo, index) => {
+            if (outerImages[index]) {
+                photo.style.setProperty('--bg-image', `url('${outerImages[index]}')`);
+            }
+        });
+        
+        // 为内层图片分配
+        innerPhotos.forEach((photo, index) => {
+            if (innerImages[index]) {
+                photo.style.setProperty('--bg-image', `url('${innerImages[index]}')`);
+            }
+        });
     });
     
     const album = document.querySelector('.album');
@@ -183,6 +221,40 @@ document.addEventListener('DOMContentLoaded', function() {
             // 只有在非点击展开状态下才响应鼠标离开
             collapseAlbum();
             isHoverExpanded = false;
+        }
+    });
+    
+    // 移动端触摸事件 - 模拟鼠标悬停
+    album.addEventListener('touchstart', function(e) {
+        e.preventDefault(); // 防止默认行为
+        if (!isClickExpanded) {
+            // 只有在非点击展开状态下才响应触摸
+            expandAlbum();
+            isHoverExpanded = true;
+        }
+    });
+    
+    // 移动端触摸结束事件 - 模拟鼠标离开
+    album.addEventListener('touchend', function(e) {
+        e.preventDefault(); // 防止默认行为
+        if (!isClickExpanded && isHoverExpanded) {
+            // 只有在非点击展开状态下才响应触摸结束
+            collapseAlbum();
+            isHoverExpanded = false;
+        }
+    });
+    
+    // 移动端触摸移出事件 - 模拟鼠标离开
+    album.addEventListener('touchmove', function(e) {
+        e.preventDefault(); // 防止默认行为
+        const touch = e.touches[0];
+        const element = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (!element || !album.contains(element)) {
+            // 如果触摸移出了相册区域
+            if (!isClickExpanded && isHoverExpanded) {
+                collapseAlbum();
+                isHoverExpanded = false;
+            }
         }
     });
 
