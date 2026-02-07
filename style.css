@@ -314,29 +314,23 @@ body::after {
     transform: rotateX(-90deg) translateZ(50px);
 }
 
-/* 内层立方体图片 */
-.inner-photo:nth-child(1)::before {
-    background-image: url('IMG/7.png');
+/* 内层立方体图片使用CSS变量，由JavaScript动态设置 */
+.inner-photo::before {
+    background-image: var(--bg-image, url('1.png'));
 }
 
-.inner-photo:nth-child(2)::before {
-    background-image: url('IMG/8.png');
-}
-
-.inner-photo:nth-child(3)::before {
-    background-image: url('IMG/1.png');
-}
-
-.inner-photo:nth-child(4)::before {
-    background-image: url('IMG/2.png');
-}
-
-.inner-photo:nth-child(5)::before {
-    background-image: url('IMG/3.png');
-}
-
-.inner-photo:nth-child(6)::before {
-    background-image: url('IMG/4.png');
+/* 确保内层图片在移动设备上显示 */
+@media (max-width: 768px) {
+    .inner-photo {
+        background-size: cover !important;
+        background-position: center !important;
+    }
+    
+    .inner-photo::before {
+        background-size: cover !important;
+        background-position: center !important;
+        background-image: var(--bg-image, url('1.png')) !important;
+    }
 }
 
 /* 内层立方体旋转动画 */
@@ -363,11 +357,11 @@ body::after {
 }
 
 .photo::before {
-    background-image: var(--bg-image, url('IMG/1.png'));
+    background-image: var(--bg-image, url('1.png'));
 }
 
 .inner-photo::before {
-    background-image: var(--bg-image, url('IMG/1.png'));
+    background-image: var(--bg-image, url('1.png'));
 }
 
 /* 确保所有照片面都能正确显示 */

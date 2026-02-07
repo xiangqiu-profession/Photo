@@ -7,9 +7,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // 随机为每个面分配唯一图片
+    // 缓存DOM元素引用
+    const album = document.querySelector('.album');
     const photos = document.querySelectorAll('.photo');
     const innerPhotos = document.querySelectorAll('.inner-photo');
+    const innerAlbum = document.querySelector('.inner-album');
     const allImageFiles = ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png'];
     
     // 预加载所有图片
@@ -40,11 +42,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const innerImages = getUniqueImages(innerPhotos.length);
     innerPhotos.forEach((photo, index) => {
         if (innerImages[index]) {
+            // 确保内层图片路径正确
             photo.style.setProperty('--bg-image', `url('${innerImages[index]}')`);
+            // 同时设置背景图片作为备份
+            photo.style.backgroundImage = `url('${innerImages[index]}')`;
         }
     });
     
-    const album = document.querySelector('.album');
     let isPaused = false;
     let animationId = null;
     let startTime = Date.now();
@@ -66,17 +70,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 photo.style.opacity = '1';
                 photo.style.zIndex = '1';
                 photo.style.animation = 'none'; // 移除CSS动画
+                // 确保初始位置正确
+                photo.style.transform = '';
             });
             
             if (innerAlbum) {
                 innerAlbum.style.opacity = '1';
                 innerAlbum.style.animation = 'none'; // 移除CSS动画
+                // 确保初始位置正确
+                innerAlbum.style.transform = 'translate(-50%, -50%)';
             }
             
-            // 延迟启动同步旋转，确保过渡动画完成
-            setTimeout(() => {
-                startSyncRotation();
-            }, 800); // 与过渡时间匹配
+            // 强制重排
+            void album.offsetWidth;
+            
+            // 立即启动同步旋转
+            startSyncRotation();
         }
     }
     
@@ -85,6 +94,11 @@ document.addEventListener('DOMContentLoaded', function() {
     let syncStartTime = 0;
     
     function startSyncRotation() {
+        // 清除之前的动画
+        if (syncAnimationId) {
+            cancelAnimationFrame(syncAnimationId);
+        }
+        
         syncStartTime = Date.now();
         syncAnimate();
     }
@@ -95,47 +109,47 @@ document.addEventListener('DOMContentLoaded', function() {
         const elapsed = (Date.now() - syncStartTime) / 10000; // 10秒/圈
         const rotation = (elapsed * 360) % 360;
         
-        const photos = document.querySelectorAll('.photo');
-        const innerAlbum = document.querySelector('.inner-album');
-        
-        // 控制外层图片旋转
-        photos.forEach((photo, index) => {
-            let baseRotation = 0;
-            switch(index) {
-                case 0:
-                    baseRotation = 0;
-                    break;
-                case 1:
-                    baseRotation = 180;
-                    break;
-                case 2:
-                    baseRotation = -90;
-                    break;
-                case 3:
-                    baseRotation = 90;
-                    break;
-                case 4:
-                    baseRotation = 90;
-                    break;
-                case 5:
-                    baseRotation = -90;
-                    break;
-            }
-            
-            if (index < 4) {
-                // 前、后、左、右四个面
-                photo.style.transform = `rotateX(${rotation}deg) rotateY(${rotation + baseRotation}deg) translateZ(300px)`;
-            } else {
-                // 上、下两个面
-                photo.style.transform = `rotateX(${rotation + baseRotation}deg) rotateY(${rotation}deg) translateZ(300px)`;
-            }
-        });
+        // 使用缓存的元素引用
+        if (photos.length > 0) {
+            photos.forEach((photo, index) => {
+                let baseRotation = 0;
+                switch(index) {
+                    case 0:
+                        baseRotation = 0;
+                        break;
+                    case 1:
+                        baseRotation = 180;
+                        break;
+                    case 2:
+                        baseRotation = -90;
+                        break;
+                    case 3:
+                        baseRotation = 90;
+                        break;
+                    case 4:
+                        baseRotation = 90;
+                        break;
+                    case 5:
+                        baseRotation = -90;
+                        break;
+                }
+                
+                if (index < 4) {
+                    // 前、后、左、右四个面
+                    photo.style.transform = `rotateX(${rotation}deg) rotateY(${rotation + baseRotation}deg) translateZ(300px)`;
+                } else {
+                    // 上、下两个面
+                    photo.style.transform = `rotateX(${rotation + baseRotation}deg) rotateY(${rotation}deg) translateZ(300px)`;
+                }
+            });
+        }
         
         // 控制内层小正方体旋转
         if (innerAlbum) {
             innerAlbum.style.transform = `translate(-50%, -50%) rotateX(${rotation}deg) rotateY(${rotation}deg)`;
         }
         
+        // 确保动画继续
         syncAnimationId = requestAnimationFrame(syncAnimate);
     }
 
